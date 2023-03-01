@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+      }
+      html {
+        font-size: 62.5%;
+      }
+      .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container > div {
+        width: 32rem;
+        padding: 1.6rem 0;
+      }
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        color: white;
+        font-size: 4.8rem;
+        font-weight: 700;
+      }
+      button {
+        width: 100%;
+        font-size: 1.6rem;
+        padding: 0.8rem;
+        margin-top: 0.8rem;
+      }
+      video {
+        width: 100%;
+      }
+      .video-container {
+        position: relative;
+      }
+      .movie {
+        padding: 0 9.6rem 1.6rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .images > img {
+        width: 100%;
+      }
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+      }
+      .controls > button {
+        width: 32rem;
+      }
+      #selector {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8rem;
+        overflow-x: auto;
+        width: 100%;
+      }
+      #selector > img {
+        height: 24rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <div class="video-container">
+          <video muted autoplay></video>
+          <div class="overlay">
+            <p></p>
+          </div>
+        </div>
+        <button>Go</button>
+      </div>
+    </div>
+    <div class="movie">
+      <div id="selector"></div>
+      <div class="controls">
+        <button disabled>Run</button>
+      </div>
+    </div>
+
+    <script>
+      const goBtn = document.getElementsByTagName("button")[0];
+      const runBtn = document.getElementsByTagName("button")[1];
+      const video = document.getElementsByTagName("video")[0];
+      const movie = document.getElementsByClassName("images")[0];
+      const counter = document.getElementsByTagName("p")[0];
+      const selector = document.getElementById("selector");
+      const images = [];
+
+      const facingMode = "user";
+      const constraints = {
+        audio: false,
+        video: {
+          facingMode,
+        },
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+        video.srcObject = stream;
+      });
+
+      goBtn.onclick = () => {
+        goBtn.disabled = true;
+        const canvas = document.createElement("canvas");
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas
+          .getContext("2d")
+          .drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL();
+        images.push(dataURL);
+        selector.innerHTML += `<img src=${dataURL} alt="">`;
+        goBtn.disabled = false;
+        runBtn.disabled = false;
+      };
+
+      runBtn.onclick = () => {
+        runBtn.disabled = true;
+        for (let i = 0; i < images.length; i++) {
+          setTimeout(() => {
+            selector.innerHTML = `<img src=${images[i]} alt="">`;
+          }, 100 * i);
+        }
+        runBtn.disabled = false;
+      };
+    </script>
+  </body>
+</html>
